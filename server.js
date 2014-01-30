@@ -135,7 +135,7 @@ app.get( '/image/:index', _getImage );
 // @param howmany is required, the number of images to generate
 app.get( '/start/:howmany', _startRoute );
 
-app.post( '/try', _trySubmission );
+app.post( '/', _trySubmission );
 
 module.exports = app;
 

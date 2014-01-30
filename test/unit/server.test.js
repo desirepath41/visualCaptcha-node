@@ -21,9 +21,9 @@ describe( 'visualCaptcha API Demo', function() {
         url: 'http://127.0.0.1:8282'
     });
 
-    describe( '/', function() {
+    describe( '/test', function() {
         it( 'should return 404 error when calling a non-existing route', function( done ) {
-           client.get( '/', function( err, req, res, data ) {
+           client.get( '/test', function( err, req, res, data ) {
                 err.statusCode.should.equal( 404 );
 
                 done();
@@ -67,7 +67,7 @@ describe( 'visualCaptcha API Demo', function() {
     describe( '/audio', function() {
         it( 'should return an mp3 audio file', function( done ) {
             client.get( '/audio', function( err, req, res, data ) {
-                res.contentType().should.equal( 'audio/mpeg' );
+                res.headers[ 'content-type' ].should.equal( 'audio/mpeg' );
                 
                 done();
             });
@@ -75,7 +75,7 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return an ogg audio file', function( done ) {
             client.get( '/audio/ogg', function( err, req, res, data ) {
-                res.contentType().should.equal( 'audio/ogg' );
+                res.headers[ 'content-type' ].should.equal( 'audio/ogg' );
                 
                 done();
             });
@@ -93,7 +93,7 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return an image file', function( done ) {
             client.get( '/image/0', function( err, req, res, data ) {
-                res.contentType().should.equal( 'image/png' );
+                res.headers[ 'content-type' ].should.equal( 'image/png' );
                 
                 done();
             });
@@ -101,7 +101,7 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return another image file', function( done ) {
             client.get( '/image/1', function( err, req, res, data ) {
-                res.contentType().should.equal( 'image/png' );
+                res.headers[ 'content-type' ].should.equal( 'image/png' );
                 
                 done();
             });
@@ -109,8 +109,8 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return a retina image file', function( done ) {
             client.get( '/image/0?retina=1', function( err, req, res, data ) {
-                res.contentType().should.equal( 'image/png' );
-                
+                res.headers[ 'content-type' ].should.equal( 'image/png' );
+
                 done();
             });
         });
@@ -125,9 +125,9 @@ describe( 'visualCaptcha API Demo', function() {
     });
 
     describe( '/try', function() {
-        it( 'should return 405 when calling /image with GET method', function( done ) {
+        it( 'should return 404 when calling /try with GET method', function( done ) {
             client.get( '/try', function( err, req, res, data ) {
-                res.statusCode.should.equal( 405 );
+                res.statusCode.should.equal( 404 );
 
                 done();
             });

@@ -1,39 +1,43 @@
 /* jshint node: true */
 'use strict';
 
-var restify = require( 'restify' ),
+var express = require( 'express' ),
     sessions = require( 'client-sessions' ),
-    app,
+    app = express(),
     _getAudio,
     _getImage,
     _startRoute,
     _trySubmission,
     visualCaptcha;
 
-// Initialize API server
-app = restify.createServer({
-    name: 'visualcaptcha-API',
-    version: '0.0.1'
-});
+app.configure( function() {
+    app.use( express.bodyParser() );
 
-app.pre( restify.pre.sanitizePath() );
+    // Set session information
+    app.use( express.cookieParser() );
+    app.use(
+        sessions( {
+            cookieName: 'session',
+            secret: 'someRandomSecret',
+            duration: 86400000,// 24h in milliseconds
+            cookie: {
+                path: '/',
+                httpOnly: true,
+                secure: false,
+                ephemeral: false
+            }
+        } )
+    );
 
-app.use( restify.bodyParser() );
+    // Enable CORS
+    app.use( function( req, res, next ) {
+        res.header( 'Access-Control-Allow-Origin', '*' );
+        next();
+    } );
 
-// Set session information
-app.use(
-    sessions({
-        cookieName: 'session',
-        secret: 'someRandomSecret',
-        duration: 86400000,// 24h in milliseconds
-        cookie: {
-            path: '/',
-            httpOnly: true,
-            secure: false,
-            ephemeral: false
-        }
-    })
-);
+    // Set public path
+    app.use( express.static( __dirname + '/public' ) );
+} );
 
 // Define routes functions
 // Fetches and streams an audio file
@@ -86,30 +90,42 @@ _startRoute = function( req, res, next ) {
 _trySubmission = function( req, res, next ) {
     var frontendData,
         howmany,
+        redirectPath,
         responseStatus,
         responseObject;
 
     // It's not impossible this method is called before visualCaptcha is initialized, so we have to send a 404
     if ( ! visualCaptcha ) {
+        redirectPath = '?status=noCaptcha';
+
         responseStatus = 404;
         responseObject = 'Not Found';
     } else {
         frontendData = visualCaptcha.getFrontendData();
 
         // If an image field name was submitted, try to validate it
-        if ( req.body[frontendData.imageFieldName] ) {
-            if ( visualCaptcha.validateImage(req.body[frontendData.imageFieldName]) ) {
+        if ( req.body[ frontendData.imageFieldName ] ) {
+            if ( visualCaptcha.validateImage( req.body[ frontendData.imageFieldName ] ) ) {
+                redirectPath = '?status=validImage';
+
                 responseStatus = 200;
             } else {
+                redirectPath = '?status=failedImage';
                 responseStatus = 403;
             }
-        } else if ( req.body[frontendData.audioFieldName] ) {
-            if ( visualCaptcha.validateAudio(req.body[frontendData.audioFieldName].toLowerCase()) ) {// We set lowercase to allow case-insensitivity, but it's actually optional
+        } else if ( req.body[ frontendData.audioFieldName ] ) {
+            if ( visualCaptcha.validateAudio( req.body[ frontendData.audioFieldName ].toLowerCase() ) ) { // We set lowercase to allow case-insensitivity, but it's actually optional
+                redirectPath = '?status=validAudio';
+
                 responseStatus = 200;
             } else {
+                redirectPath = '?status=failedAudio';
+
                 responseStatus = 403;
             }
         } else {
+            redirectPath = '?status=failedPost';
+
             responseStatus = 500;
         }
 
@@ -120,10 +136,18 @@ _trySubmission = function( req, res, next ) {
         responseObject = visualCaptcha.getFrontendData();
     }
 
-    res.send( responseStatus, responseObject );
+    if( req.accepts( 'json' ) !== undefined ) {
+        res.send( responseStatus, responseObject );
+    } else {
+        res.header( 'Location', '/' + redirectPath );
+        res.send( 302 );
+    }
 };
 
 // Routes definition
+
+
+app.post( '/try', _trySubmission );
 
 // @param type is optional and defaults to 'mp3', but can also be 'ogg'
 app.get( '/audio', _getAudio );
@@ -134,8 +158,6 @@ app.get( '/image/:index', _getImage );
 
 // @param howmany is required, the number of images to generate
 app.get( '/start/:howmany', _startRoute );
-
-app.post( '/try', _trySubmission );
 
 module.exports = app;
 

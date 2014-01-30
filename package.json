@@ -20,11 +20,12 @@
         "url": "https://github.com/emotionLoop/visualCaptcha-node"
     },
     "dependencies": {
-        "restify": "2.6.x",
+        "express": "3.4.x",
         "client-sessions": "0.5.x",
         "visualcaptcha": "*"
     },
     "devDependencies": {
+        "restify": "2.6.x",
         "mocha": "1.15.x",
         "should": "2.1.x"
     },

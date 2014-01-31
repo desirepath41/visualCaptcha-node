@@ -1,4 +1,4 @@
-visualCaptcha-node
+visualCaptcha-node [![Build Status](https://travis-ci.org/emotionLoop/visualCaptcha-node.png?branch=master)](https://travis-ci.org/emotionLoop/visualCaptcha-node)
 ==================
 
 Node.js sample for visualCaptcha.

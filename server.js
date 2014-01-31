@@ -90,6 +90,8 @@ _startRoute = function( req, res, next ) {
 _trySubmission = function( req, res, next ) {
     var frontendData,
         howmany,
+        imageAnswer,
+        audioAnswer,
         redirectPath,
         responseStatus,
         responseObject;
@@ -104,8 +106,8 @@ _trySubmission = function( req, res, next ) {
         frontendData = visualCaptcha.getFrontendData();
 
         // If an image field name was submitted, try to validate it
-        if ( req.body[ frontendData.imageFieldName ] ) {
-            if ( visualCaptcha.validateImage( req.body[ frontendData.imageFieldName ] ) ) {
+        if ( ( imageAnswer = req.body[ frontendData.imageFieldName ] ) ) {
+            if ( visualCaptcha.validateImage( imageAnswer ) ) {
                 redirectPath = '?status=validImage';
 
                 responseStatus = 200;
@@ -113,8 +115,9 @@ _trySubmission = function( req, res, next ) {
                 redirectPath = '?status=failedImage';
                 responseStatus = 403;
             }
-        } else if ( req.body[ frontendData.audioFieldName ] ) {
-            if ( visualCaptcha.validateAudio( req.body[ frontendData.audioFieldName ].toLowerCase() ) ) { // We set lowercase to allow case-insensitivity, but it's actually optional
+        } else if ( ( audioAnswer = req.body[ frontendData.audioFieldName ] ) ) {
+            // We set lowercase to allow case-insensitivity, but it's actually optional
+            if ( visualCaptcha.validateAudio( audioAnswer.toLowerCase() ) ) {
                 redirectPath = '?status=validAudio';
 
                 responseStatus = 200;
@@ -136,11 +139,13 @@ _trySubmission = function( req, res, next ) {
         responseObject = visualCaptcha.getFrontendData();
     }
 
-    if( req.accepts( 'json' ) !== undefined ) {
-        res.send( responseStatus, responseObject );
-    } else {
+    if ( req.accepts( 'html' ) !== undefined ) {
         res.header( 'Location', '/' + redirectPath );
         res.send( 302 );
+    } else if ( req.accepts( 'json' ) !== undefined ) {
+        res.send( responseStatus, responseObject );
+    } else {
+        res.send( responseStatus );
     }
 };
 

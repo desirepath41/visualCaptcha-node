@@ -2,7 +2,7 @@
     visualCaptcha( 'sample-captcha', {
         imgPath: '/img/',
         captcha: {
-            url: window.location.protocol.origin,
+            url: window.location.origin,
             numberOfImages: 5
         }
     } );

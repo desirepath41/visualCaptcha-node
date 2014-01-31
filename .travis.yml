@@ -6,7 +6,7 @@ branches:
     - master
 env:
   global:
-    - secure: "KRBDUp2mqR7y12nSUzxaExownlISzSR0O5F1AjckB+G2Yfvox0lbZMBaYKqp/YasuHM8LE7Fcm9HsnUDzZcSYI5GSfMMMCF4QdqbiQ0Y4UVpKAtNhU8BDZltmScommvjK11F9HaGck3+QodJNGoDj+lNDmhgFRHHtt5OY8QFDKU="
+    - secure: "YdzOX2oDdL1Yv0bUKFqco3/bNQ9S+nuPrQ5xaelZMw4qrjUczbJiin5mRnz5tPJbgwMyHghxiNsKMuENoyRLxTbu+ADcZUu1SAIDplc/Cqv9vG/L2GJZBLcJg69utV2AhwhKB2Zsndwy5wr2q96wfSuj/cpqg2spVpUcNk1aImI="
     - "REPOSITORY=visualcaptcha-node"
 after_success:
     "curl --data 'deploy={\"repository\":\"'$REPOSITORY'\",\"branch\":\"'$TRAVIS_BRANCH'\"}' http://githooks.emotionloop.com/?k=$AUTH_KEY"

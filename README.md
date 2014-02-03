@@ -1,7 +1,9 @@
 visualCaptcha-node [![Build Status](https://travis-ci.org/emotionLoop/visualCaptcha-node.png?branch=master)](https://travis-ci.org/emotionLoop/visualCaptcha-node)
 ==================
 
-Node.js sample for visualCaptcha.
+Node.js sample for visualCaptcha. [You can also see it live](http://node.demo.visualcaptcha.net).
+
+A demo/sample Node.js app that uses the [visualcaptcha npm module](https://github.com/emotionLoop/visualCaptcha-npm) and the [visualcaptcha vanilla js bower package](https://github.com/emotionLoop/visualCaptcha-frontend-vanilla), as a proof-of-concept for how to integrate it with your Node.js project.
 
 
 ## Installation 

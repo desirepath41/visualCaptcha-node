@@ -22,7 +22,7 @@
     "dependencies": {
         "express": "3.4.x",
         "client-sessions": "0.5.x",
-        "visualcaptcha": "*"
+        "visualcaptcha": ">= 0.0.2"
     },
     "devDependencies": {
         "restify": "2.6.x",

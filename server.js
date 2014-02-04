@@ -3,7 +3,7 @@
 
 var express = require( 'express' ),
     sessions = require( 'client-sessions' ),
-    visualCaptcha = require( 'visualCaptcha' ),
+    visualCaptcha = require( 'visualcaptcha' ),
     app = express(),
     _getAudio,
     _getImage,

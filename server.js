@@ -3,16 +3,14 @@
 
 var express = require( 'express' ),
     sessions = require( 'client-sessions' ),
+    visualCaptcha = require( 'visualCaptcha' ),
     app = express(),
     _getAudio,
     _getImage,
     _startRoute,
-    _trySubmission,
-    visualCaptcha;
+    _trySubmission;
 
 app.configure( function() {
-    app.use( express.bodyParser() );
-
     // Set session information
     app.use( express.cookieParser() );
     app.use(
@@ -35,6 +33,8 @@ app.configure( function() {
         next();
     } );
 
+    app.use( express.bodyParser() );
+
     // Set public path
     app.use( express.static( __dirname + '/public' ) );
 } );
@@ -42,108 +42,102 @@ app.configure( function() {
 // Define routes functions
 // Fetches and streams an audio file
 _getAudio = function( req, res, next ) {
-    // It's not impossible this method is called before visualCaptcha is initialized, so we have to send a 404
-    if ( ! visualCaptcha ) {
-        res.send( 404, 'Not Found' );
-    } else {
-        // Default file type is mp3, but we need to support ogg as well
-        if ( req.params.type !== 'ogg' ) {
-            req.params.type = 'mp3';
-        }
+    var captcha;
 
-        visualCaptcha.streamAudio( res, req.params.type );
+    // Default file type is mp3, but we need to support ogg as well
+    if ( req.params.type !== 'ogg' ) {
+        req.params.type = 'mp3';
     }
+
+    captcha = visualCaptcha( req.session, req.query.namespace );
+    captcha.streamAudio( res, req.params.type );
 };
 
 // Fetches and streams an image file
 _getImage = function( req, res, next ) {
-    var isRetina = false;
+    var captcha,
+        isRetina = false;
 
-    // It's not impossible this method is called before visualCaptcha is initialized, so we have to send a 404
-    if ( ! visualCaptcha ) {
-        res.send( 404, 'Not Found' );
-    } else {
-        // Default is non-retina
-        if ( req.query.retina ) {
-            isRetina = true;
-        }
-
-        visualCaptcha.streamImage( req.params.index, res, isRetina );
+    // Default is non-retina
+    if ( req.query.retina ) {
+        isRetina = true;
     }
+
+    captcha = visualCaptcha( req.session, req.query.namespace );
+    captcha.streamImage( req.params.index, res, isRetina );
 };
 
 // Start and refresh captcha options
 _startRoute = function( req, res, next ) {
-    // After initializing visualCaptcha, we only need to generate new options
-    if ( ! visualCaptcha ) {
-        visualCaptcha = require( 'visualcaptcha' )( req.session );
-    }
+    var captcha;
 
-    visualCaptcha.generate( req.params.howmany );
+    // After initializing visualCaptcha, we only need to generate new options
+    captcha = visualCaptcha( req.session, req.query.namespace );
+    captcha.generate( req.params.howmany );
 
     // We have to send the frontend data to use on POST.
-    res.send( 200, visualCaptcha.getFrontendData() );
+    res.send( 200, captcha.getFrontendData() );
 };
 
 // Try to validate the captcha
 // We need to make sure we generate new options after trying to validate, to avoid abuse
 _trySubmission = function( req, res, next ) {
-    var frontendData,
-        howmany,
+    var namespace = req.query.namespace,
+        captcha,
+        frontendData,
+        queryParams = [],
         imageAnswer,
         audioAnswer,
-        redirectPath,
         responseStatus,
         responseObject;
 
+    captcha = visualCaptcha( req.session, namespace );
+    frontendData = captcha.getFrontendData();
+
+    // Add namespace to query params, if present
+    if ( namespace && namespace.length !== 0 ) {
+        queryParams.push( 'namespace=' + namespace );
+    }
+
     // It's not impossible this method is called before visualCaptcha is initialized, so we have to send a 404
-    if ( ! visualCaptcha ) {
-        redirectPath = '?status=noCaptcha';
+    if ( typeof frontendData === 'undefined' ) {
+        queryParams.push( 'status=noCaptcha' );
 
         responseStatus = 404;
         responseObject = 'Not Found';
     } else {
-        frontendData = visualCaptcha.getFrontendData();
-
         // If an image field name was submitted, try to validate it
         if ( ( imageAnswer = req.body[ frontendData.imageFieldName ] ) ) {
-            if ( visualCaptcha.validateImage( imageAnswer ) ) {
-                redirectPath = '?status=validImage';
+            if ( captcha.validateImage( imageAnswer ) ) {
+                queryParams.push( 'status=validImage' );
 
                 responseStatus = 200;
             } else {
-                redirectPath = '?status=failedImage';
+                queryParams.push( 'status=failedImage' );
+
                 responseStatus = 403;
             }
         } else if ( ( audioAnswer = req.body[ frontendData.audioFieldName ] ) ) {
             // We set lowercase to allow case-insensitivity, but it's actually optional
-            if ( visualCaptcha.validateAudio( audioAnswer.toLowerCase() ) ) {
-                redirectPath = '?status=validAudio';
+            if ( captcha.validateAudio( audioAnswer.toLowerCase() ) ) {
+                queryParams.push( 'status=validAudio' );
 
                 responseStatus = 200;
             } else {
-                redirectPath = '?status=failedAudio';
+                queryParams.push( 'status=failedAudio' );
 
                 responseStatus = 403;
             }
         } else {
-            redirectPath = '?status=failedPost';
+            queryParams.push( 'status=failedPost' );
 
             responseStatus = 500;
         }
-
-        // We need to know how many images were generated before, to generate the same number again
-        howmany = visualCaptcha.getImageOptions().length;
-        visualCaptcha.generate( howmany );
-
-        responseObject = visualCaptcha.getFrontendData();
     }
 
     if ( req.accepts( 'html' ) !== undefined ) {
-        res.header( 'Location', '/' + redirectPath );
+        res.header( 'Location', '/?' + queryParams.join( '&' ) );
         res.send( 302 );
-    } else if ( req.accepts( 'json' ) !== undefined ) {
-        res.send( responseStatus, responseObject );
     } else {
         res.send( responseStatus );
     }

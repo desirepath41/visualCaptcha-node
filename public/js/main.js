@@ -1,8 +1,7 @@
 ( function( window, visualCaptcha ) {
     var captcha = visualCaptcha( 'sample-captcha', {
-        imgPath: '/img/',
+        imgPath: 'img/',
         captcha: {
-            url: window.location.origin,
             numberOfImages: 5
         }
     } );

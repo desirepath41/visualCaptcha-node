@@ -16,7 +16,7 @@ npm install
 
 ## Run server
 
-Run next command to start Node.js server on port 8282 (default):
+To start the server on port 8282 (default), run the following command:
 ```
 npm start
 ```
@@ -24,7 +24,7 @@ npm start
 
 ## Run tests
 
-Run next command to start mocha unit tests:
+If you want to run the unit tests, use the following command:
 ```
 npm test
 ```
@@ -32,9 +32,15 @@ npm test
 
 ## API
 
+visualCaptcha, since 5.0, uses an API for increased security and to become back-end-agnostic (that's why you can easily plug-in a Vanilla JS, AngularJS, or jQuery front-end without changing anything).
+
+It expects the following routes to exist, which we've put in this sample, using Express (just to make it easier).
+
+You are expected to have these routes in your implementation, but you can change them in visualCaptcha's front-end config.
+
 ### GET `/start/:howmany`
 
-This route is for generation common data (image field name, image name, image values and audio field name) for visual captcha front-end.
+This route will be the first route called by the front-end, which will generate and store session data.
 
 Parameters:
 
@@ -42,44 +48,29 @@ Parameters:
 
 ### GET `/image/:index`
 
-This route is for getting generated image file by index. 
+This route will be called for each image, to get it and show it, by index.
 
 Parameters:
 
-- `index` is required, the index of the image you wish to get.
+- `index` is required, the index of the image you want to get.
 
-### GET `/audio/:type`
+### GET `/audio(/:type)`
 
-This route is for getting generated audio file.
+This route will be called for the audio file, to get it and play it, either the mp3 or ogg file.
 
 Parameters:
 
-- `type` is optional, the audio file format and defaults to `mp3`, but can also be `ogg`.
+- `type` is optional, the audio file format defaults to `mp3`, but can also be `ogg`.
 
 ### POST `/try` 
 
-It is a demo example of validating the visual captcha.
+This is just a sample route, where we post the form to, and where the visualCaptcha validation takes place.
 
 
 ## License
 
-The MIT License (MIT)
+MIT. Check the LICENSE file.
 
-Copyright (c) 2014 emotionLoop
+## Coding guidelines / Code style
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+View [http://jscode.org/readable](http://jscode.org/readable)

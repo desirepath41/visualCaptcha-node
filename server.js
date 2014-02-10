@@ -3,8 +3,8 @@
 
 var express = require( 'express' ),
     sessions = require( 'client-sessions' ),
-    visualCaptcha = require( 'visualcaptcha' ),
     app = express(),
+    visualCaptcha,
     _getAudio,
     _getImage,
     _startRoute,
@@ -42,48 +42,43 @@ app.configure( function() {
 // Define routes functions
 // Fetches and streams an audio file
 _getAudio = function( req, res, next ) {
-    var captcha;
-
     // Default file type is mp3, but we need to support ogg as well
     if ( req.params.type !== 'ogg' ) {
         req.params.type = 'mp3';
     }
 
-    captcha = visualCaptcha( req.session, req.query.namespace );
-    captcha.streamAudio( res, req.params.type );
+    visualCaptcha.streamAudio( res, req.params.type );
 };
 
 // Fetches and streams an image file
 _getImage = function( req, res, next ) {
-    var captcha,
-        isRetina = false;
+    var isRetina = false;
 
     // Default is non-retina
     if ( req.query.retina ) {
         isRetina = true;
     }
 
-    captcha = visualCaptcha( req.session, req.query.namespace );
-    captcha.streamImage( req.params.index, res, isRetina );
+    visualCaptcha.streamImage( req.params.index, res, isRetina );
 };
 
 // Start and refresh captcha options
 _startRoute = function( req, res, next ) {
-    var captcha;
 
     // After initializing visualCaptcha, we only need to generate new options
-    captcha = visualCaptcha( req.session, req.query.namespace );
-    captcha.generate( req.params.howmany );
+    if ( ! visualCaptcha ) {
+        visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
+    }
+    visualCaptcha.generate( req.params.howmany );
 
     // We have to send the frontend data to use on POST.
-    res.send( 200, captcha.getFrontendData() );
+    res.send( 200, visualCaptcha.getFrontendData() );
 };
 
 // Try to validate the captcha
 // We need to make sure we generate new options after trying to validate, to avoid abuse
 _trySubmission = function( req, res, next ) {
     var namespace = req.query.namespace,
-        captcha,
         frontendData,
         queryParams = [],
         imageAnswer,
@@ -91,8 +86,7 @@ _trySubmission = function( req, res, next ) {
         responseStatus,
         responseObject;
 
-    captcha = visualCaptcha( req.session, namespace );
-    frontendData = captcha.getFrontendData();
+    frontendData = visualCaptcha.getFrontendData();
 
     // Add namespace to query params, if present
     if ( namespace && namespace.length !== 0 ) {
@@ -108,7 +102,7 @@ _trySubmission = function( req, res, next ) {
     } else {
         // If an image field name was submitted, try to validate it
         if ( ( imageAnswer = req.body[ frontendData.imageFieldName ] ) ) {
-            if ( captcha.validateImage( imageAnswer ) ) {
+            if ( visualCaptcha.validateImage( imageAnswer ) ) {
                 queryParams.push( 'status=validImage' );
 
                 responseStatus = 200;
@@ -119,7 +113,7 @@ _trySubmission = function( req, res, next ) {
             }
         } else if ( ( audioAnswer = req.body[ frontendData.audioFieldName ] ) ) {
             // We set lowercase to allow case-insensitivity, but it's actually optional
-            if ( captcha.validateAudio( audioAnswer.toLowerCase() ) ) {
+            if ( visualCaptcha.validateAudio( audioAnswer.toLowerCase() ) ) {
                 queryParams.push( 'status=validAudio' );
 
                 responseStatus = 200;

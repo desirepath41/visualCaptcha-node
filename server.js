@@ -59,7 +59,7 @@ _getImage = function( req, res, next ) {
         isRetina = true;
     }
 
-    visualCaptcha.streamImage( req.params.index, res, isRetina );
+    visualCaptcha.streamImage( req.params.id, res, isRetina );
 };
 
 // Start and refresh captcha options

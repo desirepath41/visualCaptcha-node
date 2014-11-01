@@ -2,57 +2,59 @@
 'use strict';
 
 var express = require( 'express' ),
+    bodyParser = require( 'body-parser' ),
     sessions = require( 'client-sessions' ),
     app = express(),
-    visualCaptcha,
     _getAudio,
     _getImage,
     _startRoute,
     _trySubmission;
 
-app.configure( function() {
-    // Set session information
-    app.use( express.cookieParser() );
-    app.use(
-        sessions( {
-            cookieName: 'session',
-            secret: 'someRandomSecret',
-            duration: 86400000,// 24h in milliseconds
-            cookie: {
-                path: '/',
-                httpOnly: true,
-                secure: false,
-                ephemeral: false
-            }
-        } )
-    );
+// Set session information
+app.use( sessions({
+    cookieName: 'session',
+    secret: 'someRandomSecret!',
+    duration: 24 * 60 * 60 * 1000,
+    activeDuration: 1000 * 60 * 5
+}) );
 
-    // Enable CORS
-    app.use( function( req, res, next ) {
-        res.header( 'Access-Control-Allow-Origin', '*' );
-        next();
-    } );
-
-    app.use( express.bodyParser() );
-
-    // Set public path
-    app.use( express.static( __dirname + '/public' ) );
+// Enable CORS
+app.use( function( req, res, next ) {
+    res.header( 'Access-Control-Allow-Origin', '*' );
+    next();
 } );
+
+// parse application/x-www-form-urlencoded
+app.use( bodyParser.urlencoded({ extended: false }) );
+// parse application/json
+app.use( bodyParser.json() );
+
+// Set public path
+app.use( express.static( __dirname + '/public' ) );
 
 // Define routes functions
 // Fetches and streams an audio file
 _getAudio = function( req, res, next ) {
+    var visualCaptcha;
+
     // Default file type is mp3, but we need to support ogg as well
     if ( req.params.type !== 'ogg' ) {
         req.params.type = 'mp3';
     }
+
+    // Initialize visualCaptcha
+    visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
 
     visualCaptcha.streamAudio( res, req.params.type );
 };
 
 // Fetches and streams an image file
 _getImage = function( req, res, next ) {
-    var isRetina = false;
+    var visualCaptcha,
+        isRetina = false;
+
+    // Initialize visualCaptcha
+    visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
 
     // Default is non-retina
     if ( req.query.retina ) {
@@ -64,27 +66,31 @@ _getImage = function( req, res, next ) {
 
 // Start and refresh captcha options
 _startRoute = function( req, res, next ) {
+    var visualCaptcha;
 
-    // After initializing visualCaptcha, we only need to generate new options
-    if ( ! visualCaptcha ) {
-        visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
-    }
+    // Initialize visualCaptcha
+    visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
+
     visualCaptcha.generate( req.params.howmany );
 
     // We have to send the frontend data to use on POST.
-    res.send( 200, visualCaptcha.getFrontendData() );
+    res.status( 200 ).send( visualCaptcha.getFrontendData() );
 };
 
 // Try to validate the captcha
 // We need to make sure we generate new options after trying to validate, to avoid abuse
 _trySubmission = function( req, res, next ) {
-    var namespace = req.query.namespace,
+    var visualCaptcha,
+        namespace = req.query.namespace,
         frontendData,
         queryParams = [],
         imageAnswer,
         audioAnswer,
         responseStatus,
         responseObject;
+
+    // Initialize visualCaptcha
+    visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
 
     frontendData = visualCaptcha.getFrontendData();
 
@@ -130,10 +136,9 @@ _trySubmission = function( req, res, next ) {
     }
 
     if ( req.accepts( 'html' ) !== undefined ) {
-        res.header( 'Location', '/?' + queryParams.join( '&' ) );
-        res.send( 302 );
+        res.redirect( '/?' + queryParams.join( '&' ) );
     } else {
-        res.send( responseStatus );
+        res.status( responseStatus );
     }
 };
 

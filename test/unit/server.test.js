@@ -11,7 +11,11 @@ describe( 'visualCaptcha API Demo', function() {
     describe( '/test', function() {
         it( 'should return 404 error when calling a non-existing route', function( done ) {
             request( app ).get( '/test' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 404 );
     
                     done();
@@ -22,7 +26,11 @@ describe( 'visualCaptcha API Demo', function() {
     describe( '/start', function() {
         it( 'should return 404 when calling /start without the number of requested images', function( done ) {
             request( app ).get( '/start' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 404 );
     
                     done();
@@ -31,7 +39,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return 200 when calling /start/5, the image and audio field names, image name, and image values', function( done ) {
             request( app ).get( '/start/5' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     var data = res.body;
 
                     res.statusCode.should.equal( 200 );
@@ -64,7 +76,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return an mp3 audio file', function( done ) {
             agent.get( '/audio' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 200 );
                     res.headers[ 'content-type' ].should.equal( 'audio/mpeg' );
 
@@ -74,7 +90,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return an ogg audio file', function( done ) {
             agent.get( '/audio/ogg' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 200 );
                     res.headers[ 'content-type' ].should.equal( 'audio/ogg' );
                     
@@ -93,7 +113,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return 404 when calling /image without the index number', function( done ) {
             agent.get( '/image' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 404 );
     
                     done();
@@ -102,7 +126,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return an image file', function( done ) {
             agent.get( '/image/0' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 200 );
                     res.headers[ 'content-type' ].should.equal( 'image/png' );
                     
@@ -112,7 +140,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return another image file', function( done ) {
             agent.get( '/image/1' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 200 );
                     res.headers[ 'content-type' ].should.equal( 'image/png' );
                     
@@ -122,7 +154,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return a retina image file', function( done ) {
             agent.get( '/image/0?retina=1' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 200 );
                     res.headers[ 'content-type' ].should.equal( 'image/png' );
     
@@ -132,7 +168,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return 404 when calling /image with a non-existing index number', function( done ) {
             agent.get( '/image/100' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 404 );
     
                     done();
@@ -147,7 +187,11 @@ describe( 'visualCaptcha API Demo', function() {
         beforeEach( function( done ) {
             // Start the session
             agent.get( '/start/5' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     frontendData = res.body;
 
                     done();
@@ -156,7 +200,11 @@ describe( 'visualCaptcha API Demo', function() {
 
         it( 'should return 404 when calling /try with GET method', function( done ) {
             agent.get( '/try' )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 404 );
     
                     done();
@@ -166,7 +214,11 @@ describe( 'visualCaptcha API Demo', function() {
         it( 'should redirect to /?status=failedPost when no data is posted', function( done ) {
             agent.post( '/try' )
                 .send( {} )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 302 );
                     res.headers['location'].should.equal( '/?status=failedPost' );
     
@@ -181,7 +233,11 @@ describe( 'visualCaptcha API Demo', function() {
 
             agent.post( '/try' )
                 .send( postObject )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 302 );
                     res.headers['location'].should.equal( '/?status=failedImage' );
     
@@ -196,7 +252,11 @@ describe( 'visualCaptcha API Demo', function() {
 
             agent.post( '/try' )
                 .send( postObject )
-                .end( function( req, res ) {
+                .end( function( err, res ) {
+                    if ( err ) {
+                        return done( err );
+                    }
+
                     res.statusCode.should.equal( 302 );
                     res.headers['location'].should.equal( '/?status=failedAudio' );
     

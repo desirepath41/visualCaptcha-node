@@ -1,7 +1,7 @@
 # visualCaptcha-node
 
-[![Build Status](https://travis-ci.org/emotionLoop/visualCaptcha-node.png?branch=master)](https://travis-ci.org/emotionLoop/visualCaptcha-node)
-[![Coverage Status](https://coveralls.io/repos/emotionLoop/visualCaptcha-node/badge.png)](https://coveralls.io/r/emotionLoop/visualCaptcha-node)
+[![Build Status](https://travis-ci.org/emotionLoop/visualCaptcha-node.svg?flat=true&branch=master)](https://travis-ci.org/emotionLoop/visualCaptcha-node)
+[![Coverage Status](https://coveralls.io/repos/emotionLoop/visualCaptcha-node/badge.svg?flat=true)](https://coveralls.io/r/emotionLoop/visualCaptcha-node)
 [![Code Climate](https://codeclimate.com/github/emotionLoop/visualCaptcha-node/badges/gpa.svg)](https://codeclimate.com/github/emotionLoop/visualCaptcha-node)
 
 Node.js sample for visualCaptcha. [You can also see it live](http://node.demo.visualcaptcha.net).

@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/emotionLoop/visualCaptcha-node.svg?flat=true&branch=master)](https://travis-ci.org/emotionLoop/visualCaptcha-node)
 [![Coverage Status](https://coveralls.io/repos/emotionLoop/visualCaptcha-node/badge.svg?flat=true)](https://coveralls.io/r/emotionLoop/visualCaptcha-node)
+[![Codacy](https://www.codacy.com/project/badge/fd2763e38c584ec689c2617c112852e8)](https://www.codacy.com/app/bruno-bernardino/visualCaptcha-node)
 [![Code Climate](https://codeclimate.com/github/emotionLoop/visualCaptcha-node/badges/gpa.svg)](https://codeclimate.com/github/emotionLoop/visualCaptcha-node)
 
 Node.js sample for visualCaptcha. [You can also see it live](http://node.demo.visualcaptcha.net).

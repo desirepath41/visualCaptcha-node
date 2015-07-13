@@ -4,16 +4,16 @@
         captcha: {
             numberOfImages: 5,
             callbacks: {
-              loaded: function( captcha ) {
-                // Avoid adding the hashtag to the URL when clicking/selecting visualCaptcha options
-                var anchorOptions = document.getElementById( 'sample-captcha' ).getElementsByTagName( 'a' );
-                var anchorList = Array.prototype.slice.call( anchorOptions );// .getElementsByTagName does not return an actual array
-                anchorList.forEach( function( anchorItem ) {
-                    _bindClick( anchorItem, function( event ) {
-                        event.preventDefault();
+                loaded: function( captcha ) {
+                    // Avoid adding the hashtag to the URL when clicking/selecting visualCaptcha options
+                    var anchorOptions = document.getElementById( 'sample-captcha' ).getElementsByTagName( 'a' );
+                    var anchorList = Array.prototype.slice.call( anchorOptions );// .getElementsByTagName does not return an actual array
+                    anchorList.forEach( function( anchorItem ) {
+                        _bindClick( anchorItem, function( event ) {
+                            event.preventDefault();
+                        });
                     });
-                });
-              }
+                }
             }
         }
     } );

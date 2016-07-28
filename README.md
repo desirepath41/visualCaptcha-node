@@ -5,7 +5,7 @@
 [![Codacy](https://www.codacy.com/project/badge/fd2763e38c584ec689c2617c112852e8)](https://www.codacy.com/app/bruno-bernardino/visualCaptcha-node)
 [![Code Climate](https://codeclimate.com/github/emotionLoop/visualCaptcha-node/badges/gpa.svg)](https://codeclimate.com/github/emotionLoop/visualCaptcha-node)
 
-Node.js sample for visualCaptcha. [You can also see it live](http://node.demo.visualcaptcha.net).
+Node.js sample for visualCaptcha.
 
 A demo/sample Node.js app that uses the [visualcaptcha npm module](https://github.com/emotionLoop/visualCaptcha-npm) and the [visualcaptcha vanilla js bower package](https://github.com/emotionLoop/visualCaptcha-frontend-vanilla), as a proof-of-concept for how to integrate it with your Node.js project.
 
